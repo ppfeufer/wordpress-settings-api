@@ -1,2 +1,2 @@
-# wordpress-settings-api
-WordPress Settings API
+# WordPress Settings API
+for usage in themes and plugins to easiely add some settings
