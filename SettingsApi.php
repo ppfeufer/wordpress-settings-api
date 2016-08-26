@@ -14,8 +14,6 @@
 // Do not load this file directly
 \defined('ABSPATH') or die();
 
-\defined('APPLICATION_ENV') || \define('APPLICATION_ENV', (\preg_match('/development/', \getenv('APPLICATION_ENV')) || \preg_match('/staging/', \getenv('APPLICATION_ENV'))) ? \getenv('APPLICATION_ENV') : 'production');
-
 class SettingsApi {
 	/**
 	 * Settings Arguments
@@ -883,7 +881,7 @@ class SettingsApi {
 			\wp_enqueue_script('jquery-ui-datepicker');
 			\wp_enqueue_script(
 				'settings-api',
-				(\preg_match('/development/', \APPLICATION_ENV)) ? $this->getUri('js/settings-api.js') : $this->getUri('js/settings-api.min.js')
+				(\WP_DEBUG === true) ? $this->getUri('js/settings-api.js') : $this->getUri('js/settings-api.min.js')
 			);
 		} // END if($this->isSettingsPage() === true)
 	} // END public function enqueueScripts()
@@ -897,11 +895,11 @@ class SettingsApi {
 			\wp_enqueue_style('jquery-ui', $this->getUri('css/jquery-ui.min.css'));
 			\wp_enqueue_style(
 				'font-awesome',
-				(\preg_match('/development/', \APPLICATION_ENV)) ? $this->getUri('css/font-awesome.css') : $this->getUri('css/font-awesome.min.css')
+				(\WP_DEBUG === true) ? $this->getUri('css/font-awesome.css') : $this->getUri('css/font-awesome.min.css')
 			);
 			\wp_enqueue_style(
 				'settings-api',
-				(\preg_match('/development/', \APPLICATION_ENV)) ? $this->getUri('css/settings-api.css') : $this->getUri('css/settings-api.min.css')
+				(\WP_DEBUG === true) ? $this->getUri('css/settings-api.css') : $this->getUri('css/settings-api.min.css')
 			);
 		} // END if($this->isSettingsPage() === true)
 	} // END public function enqueueStyles()
