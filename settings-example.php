@@ -14,10 +14,10 @@ function fireSettingsApi() {
 	$settingsApi = new SettingsApi($settingsFilter, $defaultOptions);
 	$settingsApi->init();
 
-	\add_filter($this->settingsFilter, 'renderSettingsPage');
+	\add_filter($this->settingsFilter, 'getMySettings');
 } // END function fireSettingsApi()
 
-function renderSettingsPage() {
+function getMySettings() {
 	$themeOptionsPage['my-settings-page-slug'] = array(
 		'type' => 'theme',
 		'menu_title' => \__('Options', 'my-text-domain'),
