@@ -15,14 +15,13 @@
 	display: inline-block;
 	text-align: center;
 	margin: 0.5rem;
+	max-width: 100px;
+	vertical-align: top;
 }
 
-.settings-type-radio li.horizontal:first-child {
-	margin-left: 0;
-}
-
-.settings-type-radio li.horizontal:last-child {
+.settings-type-radio li.horizontal input {
 	margin-right: 0;
+	width: 100%;
 }
 
 .settings-type-radio li.horizontal input {
