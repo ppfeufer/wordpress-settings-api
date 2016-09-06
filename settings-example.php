@@ -14,7 +14,7 @@ function fireSettingsApi() {
 	$settingsApi = new SettingsApi($settingsFilter, $defaultOptions);
 	$settingsApi->init();
 
-	\add_filter($this->settingsFilter, 'getMySettings');
+	\add_filter($settingsFilter, 'getMySettings');
 } // END function fireSettingsApi()
 
 function getMySettings() {
