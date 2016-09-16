@@ -14,6 +14,8 @@
 // Do not load this file directly
 \defined('ABSPATH') or die();
 
+require_once('helper/StringHelper.php');
+
 class SettingsApi {
 	/**
 	 * Settings Arguments
@@ -42,6 +44,13 @@ class SettingsApi {
 	 * @var array
 	 */
 	private $optionsDefault = null;
+
+	/**
+	 * Section ID
+	 *
+	 * @var type
+	 */
+	private $sectionId;
 
 	/**
 	 * Constructor
@@ -87,16 +96,17 @@ class SettingsApi {
 	 * is used for a theme or a plugin.
 	 *
 	 * @param string $file
-	 * @return boolean
+	 * @return mixed string|boolean
 	 */
 	private function getUri($file = null) {
+		$returnValue = false;
 		$file_path = \trailingslashit(\str_replace('\\', '/', \str_replace(\str_replace('/', '\\', \WP_CONTENT_DIR ), '', \dirname(__FILE__))));
 
 		if($file_path) {
-			return \content_url($file_path . $file);
+			$returnValue =  \content_url($file_path . $file);
 		} // END if($file_path)
 
-		return false;
+		return $returnValue;
 	} // END private function getUri($file = null)
 
 	/**
@@ -163,7 +173,7 @@ class SettingsApi {
 				foreach($settings['tabs'] as $tab_id => $item) {
 					$sanitized_tab_id = \sanitize_title($tab_id);
 					$tab_description = (!empty($item['tab_description']) ) ? $item['tab_description'] : '';
-					$this->section_id = $sanitized_tab_id;
+					$this->sectionId = $sanitized_tab_id;
 					$setting_args = array(
 						'option_group' => 'section_page_' . $page_id . '_' . $sanitized_tab_id,
 						'option_name' => $settings['option_name']
@@ -241,16 +251,19 @@ class SettingsApi {
 	public function isSettingsPage() {
 		$menus = array();
 		$get_page = (!empty($_GET['page']) ) ? $_GET['page'] : '';
+		$returnValue = false;
 
+		/* @var $menu string */
+		/* @var $page string */
 		foreach($this->settingsArray as $menu => $page) {
 			$menus[] = $menu;
 		} // END foreach($this->settingsArray as $menu => $page)
 
 		if(\in_array($get_page, $menus)) {
-			return true;
-		} else {
-			return false;
+			$returnValue =  true;
 		} // END if(in_array($get_page, $menus))
+
+		return $returnValue;
 	} // END public function isSettingsPage()
 
 	/**
@@ -273,7 +286,8 @@ class SettingsApi {
 	 */
 	public function get() {
 		if(!empty($this->args['get'])) {
-			$item_array = \call_user_func_array(array($this, 'get_' . $this->args['get']), array($this->args));
+//			$item_array = \call_user_func_array(array($this, 'get_' . $this->args['get']), array($this->args));
+			$item_array = \call_user_func_array(array($this, 'get' . StringHelper::camelCase($this->args['get']), true), array($this->args));
 		} elseif(!empty($this->args['choices'])) {
 			$item_array = $this->selectChoices($this->args);
 		} else {
@@ -286,7 +300,7 @@ class SettingsApi {
 	/**
 	 * Get users from WordPress, used by the select field type
 	 */
-	public function get_users() {
+	public function getUsers() {
 		$items = array();
 		$args = (!empty($this->args['args'])) ? $this->args['args'] : null;
 		$users = \get_users($args);
@@ -296,12 +310,12 @@ class SettingsApi {
 		} // END foreach($users as $user)
 
 		return $items;
-	} // END public function get_users()
+	} // END public function getUsers()
 
 	/**
 	 * Get menus from WordPress, used by the select field type
 	 */
-	public function get_menus() {
+	public function getMenus() {
 		$items = array();
 		$menus = \get_registered_nav_menus();
 
@@ -312,12 +326,12 @@ class SettingsApi {
 		} // END if(!empty($menus))
 
 		return $items;
-	} // END public function get_menus()
+	} // END public function getMenus()
 
 	/**
 	 * Get posts from WordPress, used by the select field type
 	 */
-	public function get_posts() {
+	public function getPosts() {
 		$items = null;
 
 		if($this->args['get'] === 'posts' && !empty($this->args['post_type'])) {
@@ -346,12 +360,12 @@ class SettingsApi {
 		} // END if($this->args['get'] === 'posts' && !empty($this->args['post_type']))
 
 		return $items;
-	} // END public function get_posts()
+	} // END public function getPosts()
 
 	/**
 	 * Get terms from WordPress, used by the select field type
 	 */
-	public function get_terms() {
+	public function getTerms() {
 		$items = array();
 		$taxonomies = (!empty($this->args['taxonomies']) ) ? $this->args['taxonomies'] : null;
 		$args = (!empty($this->args['args'])) ? $this->args['args'] : null;
@@ -364,12 +378,12 @@ class SettingsApi {
 		} // END if(!empty($terms))
 
 		return $items;
-	} // END public function get_terms()
+	} // END public function getTerms()
 
 	/**
 	 * Get taxonomies from WordPress, used by the select field type
 	 */
-	public function get_taxonomies() {
+	public function getTaxonomies() {
 		$items = array();
 		$args = (!empty($this->args['args'])) ? $this->args['args'] : null;
 		$taxonomies = \get_taxonomies($args, 'objects');
@@ -381,12 +395,12 @@ class SettingsApi {
 		} // END if(!empty($taxonomies))
 
 		return $items;
-	} // END public function get_taxonomies()
+	} // END public function getTaxonomies()
 
 	/**
 	 * Get sidebars from WordPress, used by the select field type
 	 */
-	public function get_sidebars() {
+	public function getSidebars() {
 		$items = array();
 
 		global $wp_registered_sidebars;
@@ -398,12 +412,12 @@ class SettingsApi {
 		} // END if(!empty($wp_registered_sidebars))
 
 		return $items;
-	} // END public function get_sidebars()
+	} // END public function getSidebars()
 
 	/**
 	 * Get themes from WordPress, used by the select field type
 	 */
-	public function get_themes() {
+	public function getThemes() {
 		$items = array();
 		$args = (!empty($this->args['args'])) ? $this->args['args'] : null;
 		$themes = \wp_get_themes($args);
@@ -415,12 +429,12 @@ class SettingsApi {
 		} // END if(!empty($themes))
 
 		return $items;
-	} // END public function get_themes()
+	} // END public function getThemes()
 
 	/**
 	 * Get plugins from WordPress, used by the select field type
 	 */
-	public function get_plugins() {
+	public function getPlugins() {
 		$items = array();
 		$args = (!empty($this->args['args'])) ? $this->args['args'] : null;
 		$plugins = \get_plugins($args);
@@ -432,12 +446,12 @@ class SettingsApi {
 		} // END if(!empty($plugins))
 
 		return $items;
-	} // END public function get_plugins()
+	} // END public function getPlugins()
 
 	/**
 	 * Get post_types from WordPress, used by the select field type
 	 */
-	public function get_post_types() {
+	public function getPostTypes() {
 		$items = array();
 		$args = (!empty($this->args['args'])) ? $this->args['args'] : null;
 		$post_types = \get_post_types($args, 'objects');
@@ -449,7 +463,7 @@ class SettingsApi {
 		} // END if(!empty($post_types))
 
 		return $items;
-	} // END public function get_post_types()
+	} // END public function getPostTypes()
 
 	/**
 	 * Find a selected value in select or multiselect field type
