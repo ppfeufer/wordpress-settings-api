@@ -224,22 +224,26 @@ class SettingsApi {
 	 * For now only works with plugin settings
 	 */
 	public function registerCallback() {
+		$getCallback = \filter_input(\INPUT_GET, 'callback');
+		$getWpNonce = \filter_input(\INPUT_GET, '_wpnonce');
+		$getPage = \filter_input(\INPUT_GET, 'page');
+
 		if($this->isSettingsPage() === true) {
-			if(!empty($_GET['callback'])) {
-				$nonce = \wp_verify_nonce($_GET['_wpnonce']);
+			if(!empty($getCallback)) {
+				$nonce = \wp_verify_nonce($getWpNonce);
 
 				if(!empty($nonce)) {
-					if(function_exists($_GET['callback'])) {
-						$message = \call_user_func($_GET['callback']);
+					if(\function_exists($getCallback)) {
+						$message = \call_user_func($getCallback);
 						\update_option('rsa-message', $message);
 
-						$url = admin_url('options-general.php?page=' . $_GET['page']);
+						$url = admin_url('options-general.php?page=' . $getPage);
 						\wp_redirect($url);
 
 						die;
-					} // END if(function_exists($_GET['callback']))
+					} // END if(\function_exists($getCallback))
 				} // END if(!empty($nonce))
-			} // END if(!empty($_GET['callback']))
+			} // END if(!empty($getCallback))
 		} // END if($this->isSettingsPage() === true)
 	} // END public function registerCallback()
 
@@ -250,7 +254,8 @@ class SettingsApi {
 	 */
 	public function isSettingsPage() {
 		$menus = array();
-		$get_page = (!empty($_GET['page']) ) ? $_GET['page'] : '';
+		$getPage = \filter_input(\INPUT_GET, 'page');
+		$get_page = (!empty($getPage) ) ? $getPage : '';
 		$returnValue = false;
 
 		/* @var $menu string */
@@ -286,7 +291,6 @@ class SettingsApi {
 	 */
 	public function get() {
 		if(!empty($this->args['get'])) {
-//			$item_array = \call_user_func_array(array($this, 'get_' . $this->args['get']), array($this->args));
 			$item_array = \call_user_func_array(array($this, 'get' . StringHelper::camelCase($this->args['get']), true), array($this->args));
 		} elseif(!empty($this->args['choices'])) {
 			$item_array = $this->selectChoices($this->args);
@@ -469,11 +473,15 @@ class SettingsApi {
 	 * Find a selected value in select or multiselect field type
 	 */
 	public function selected($key) {
+		$returnValue = null;
+
 		if($this->valueType() == 'array') {
-			return $this->multiselectedValue($key);
+			$returnValue = $this->multiselectedValue($key);
 		} else {
-			return $this->selectedValue($key);
+			$returnValue = $this->selectedValue($key);
 		} // END if($this->valueType() == 'array')
+
+		return $returnValue;
 	} // END public function selected($key)
 
 	/**
@@ -543,7 +551,8 @@ class SettingsApi {
 	 * field type, return string or array
 	 */
 	public function valueType() {
-		$default_single = array(
+		$returnValue = null;
+		$defaultSingle = array(
 			'select',
 			'radio',
 			'text',
@@ -560,37 +569,47 @@ class SettingsApi {
 			'image',
 			'file'
 		);
-		$default_multiple = array('multiselect', 'checkbox');
+		$defaultMultiple = array(
+			'multiselect',
+			'checkbox'
+		);
 
-		if(\in_array($this->args['type'], $default_single)) {
-			return 'string';
-		} elseif(in_array($this->args['type'], $default_multiple)) {
-			return 'array';
-		} // END if(in_array($this->args['type'], $default_single))
+		if(\in_array($this->args['type'], $defaultSingle)) {
+			$returnValue = 'string';
+		} elseif(\in_array($this->args['type'], $defaultMultiple)) {
+			$returnValue = 'array';
+		} // END if(in_array($this->args['type'], $defaultSingle))
+
+		return $returnValue;
 	} // END public function valueType()
 
 	/**
 	 * Check if a checkbox has items
 	 */
 	public function hasItems() {
+		$returnValue = false;
+
 		if(!empty($this->args['choices']) && \is_array($this->args['choices'])) {
-			return true;
+			$returnValue = true;
 		} // END if(!empty($this->args['choices']) && is_array($this->args['choices']))
 
-		return false;
+		return $returnValue;
 	} // END public function hasItems()
 
 	/**
 	 * Return the html name of the field
 	 */
 	public function name($slug = '') {
+		$returnValue = null;
 		$option_name = \sanitize_title($this->args['option_name']);
 
 		if($this->valueType() == 'array') {
-			return $option_name . '[' . $this->args['field_id'] . '][' . $slug . ']';
+			$returnValue = $option_name . '[' . $this->args['field_id'] . '][' . $slug . ']';
 		} else {
-			return $option_name . '[' . $this->args['field_id'] . ']';
+			$returnValue = $option_name . '[' . $this->args['field_id'] . ']';
 		} // END if($this->valueType() == 'array')
+
+		return $returnValue;
 	} // END public function name($slug = '')
 
 	/**
@@ -762,10 +781,11 @@ class SettingsApi {
 					break;
 
 				case 'button':
+					$getPage = \filter_input(\INPUT_GET, 'page');
 					$warning_message = (!empty($args['warning-message'])) ? $args['warning-message'] : 'Unsaved settings will be lost. Continue?';
 					$warning = (!empty($args['warning'])) ? ' onclick="return confirm(' . "'" . $warning_message . "'" . ')"' : '';
 					$label = (!empty($args['label'])) ? $args['label'] : '';
-					$complete_url = \wp_nonce_url(\admin_url('options-general.php?page=' . $_GET['page'] . '&callback=' . $args['callback']));
+					$complete_url = \wp_nonce_url(\admin_url('options-general.php?page=' . $getPage . '&callback=' . $args['callback']));
 					?>
 					<a href="<?php echo $complete_url; ?>" class="button button-secondary"<?php echo $warning; ?>><?php echo $label; ?></a>
 					<?php
@@ -809,7 +829,7 @@ class SettingsApi {
 	public function renderOptions() {
 		global $wp_settings_sections;
 
-		$page = $_GET['page'];
+		$page = \filter_input(\INPUT_GET, 'page');
 		$settings = $this->settingsArray[$page];
 		$message = \get_option('rsa-message');
 
@@ -855,12 +875,12 @@ class SettingsApi {
 					$i = 0;
 					foreach($settings['tabs'] as $settings_id => $section) {
 						$sanitized_id = \sanitize_title($settings_id);
-						$page_id = $_GET['page'] . '_' . $sanitized_id;
+						$page_id = $page . '_' . $sanitized_id;
 
 						$display = ($i == 0) ? ' style="display: block;"' : ' style="display:none;"';
 
 						echo '<div class="tab-content" id="tab-content-' . $sanitized_id . '"' . $display . '>';
-						echo \settings_fields('section_page_' . $_GET['page'] . '_' . $sanitized_id);
+						echo \settings_fields('section_page_' . $page . '_' . $sanitized_id);
 
 						\do_settings_sections($page_id);
 
@@ -869,7 +889,7 @@ class SettingsApi {
 						$i++;
 					} // END foreach($settings['tabs'] as $settings_id => $section)
 
-					$complete_url = \wp_nonce_url(\admin_url('options-general.php?page=' . $_GET['page'] . '&callback=rsa_delete_settings'));
+//					$complete_url = \wp_nonce_url(\admin_url('options-general.php?page=' . $page . '&callback=rsa_delete_settings'));
 
 					\submit_button();
 					?>
@@ -920,7 +940,7 @@ class SettingsApi {
 	public function adminScripts() {
 		if($this->isSettingsPage() === true) {
 			?>
-			<script>
+			<script type="text/javascript">
 			jQuery(document).ready(function($) {
 				<?php
 				$settingsArray = $this->settingsArray;
