@@ -224,11 +224,11 @@ class SettingsApi {
 	 * For now only works with plugin settings
 	 */
 	public function registerCallback() {
-		$getCallback = \filter_input(\INPUT_GET, 'callback');
-		$getWpNonce = \filter_input(\INPUT_GET, '_wpnonce');
-		$getPage = \filter_input(\INPUT_GET, 'page');
-
 		if($this->isSettingsPage() === true) {
+			$getCallback = \filter_input(\INPUT_GET, 'callback');
+			$getWpNonce = \filter_input(\INPUT_GET, '_wpnonce');
+			$getPage = \filter_input(\INPUT_GET, 'page');
+
 			if(!empty($getCallback)) {
 				$nonce = \wp_verify_nonce($getWpNonce);
 
