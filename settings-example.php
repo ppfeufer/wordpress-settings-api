@@ -72,6 +72,10 @@ function getGeneralSettingsFields() {
 
 function getBackgroundSettingsFields() {
 	return array(
+		'' => array(
+			'type' => 'info',
+			'infotext' => \__('This Infotext will be displayed in a little infobox above the settings', 'my-text-domain')
+		),
 		'use_background_image' => array(
 			'type' => 'checkbox',
 			'title' => \__('Use Background Image', 'my-text-domain'),
