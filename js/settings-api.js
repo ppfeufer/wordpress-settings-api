@@ -20,10 +20,10 @@ jQuery(document).ready(function($) {
 
 		var send_attachment_bkp = wp.media.editor.send.attachment;
 //		var data_id = $(this).attr('id');
-		var data_id = $(this).data('field-id');
+		var dataID = $(this).data('field-id');
 
 		wp.media.editor.send.attachment = function(props, attachment) {
-			var current = '[data-id="' + data_id + '"]';
+			var current = '[data-id="' + dataID + '"]';
 
 			if(attachment.sizes && attachment.sizes.thumbnail && attachment.sizes.thumbnail.url) {
 				$(current + ' .image img').attr('src', attachment.sizes.thumbnail.url);
@@ -47,8 +47,8 @@ jQuery(document).ready(function($) {
 	$('.remove').click(function(e) {
 		e.preventDefault();
 
-		var data_id = $(this).parent().attr('data-id');
-		var current = '[data-id="' + data_id + '"]';
+		var dataID = $(this).parent().attr('data-id');
+		var current = '[data-id="' + dataID + '"]';
 
 		$(current + ' .url code').html('').hide();
 		$(current + ' .attachment_id').val('');
