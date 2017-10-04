@@ -381,6 +381,9 @@ class SettingsApi {
 		if(!empty($terms)) {
 			foreach($terms as $key => $term) {
 				$items[$term->term_id] = $term->name;
+
+				// not used at the moment
+				unset($key);
 			} // END foreach($terms as $key => $term)
 		} // END if(!empty($terms))
 
