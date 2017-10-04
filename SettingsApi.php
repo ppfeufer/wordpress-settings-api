@@ -67,12 +67,12 @@ class SettingsApi {
 	 * Initializing all actions
 	 */
 	public function init() {
-		\add_action('init', array($this, 'initSettings'));
-		\add_action('admin_menu', array($this, 'menuPage'));
-		\add_action('admin_init', array($this, 'registerFields'));
-		\add_action('admin_init', array($this, 'registerCallback'));
-		\add_action('admin_enqueue_scripts', array($this, 'enqueueScripts'));
-		\add_action('admin_enqueue_scripts', array($this, 'enqueueStyles'));
+		\add_action('init', [$this, 'initSettings']);
+		\add_action('admin_menu', [$this, 'menuPage']);
+		\add_action('admin_init', [$this, 'registerFields']);
+		\add_action('admin_init', [$this, 'registerCallback']);
+		\add_action('admin_enqueue_scripts', [$this, 'enqueueScripts']);
+		\add_action('admin_enqueue_scripts', [$this, 'enqueueStyles']);
 	} // END public function init()
 
 	/**
@@ -82,10 +82,10 @@ class SettingsApi {
 	 */
 	public function initSettings() {
 		if(\is_admin()) {
-			$this->settingsArray = \apply_filters($this->settingsFilter, array());
+			$this->settingsArray = \apply_filters($this->settingsFilter, []);
 
 			if($this->isSettingsPage() === true) {
-				\add_action('admin_head', array($this, 'adminScripts'));
+				\add_action('admin_head', [$this, 'adminScripts']);
 			} // END if($this->isSettingsPage() === true)
 		} // END if(is_admin())
 	} // END public function initSettings()
@@ -139,10 +139,10 @@ class SettingsApi {
 							$options['menu_title'],
 							$options['capability'],
 							$menu_slug,
-							array(
+							[
 								$this,
 								'renderOptions'
-							)
+							]
 						);
 						break;
 
@@ -153,10 +153,10 @@ class SettingsApi {
 							$options['menu_title'],
 							$options['capability'],
 							$menu_slug,
-							array(
+							[
 								$this,
 								'renderOptions'
-							)
+							]
 						);
 						break;
 				} // END switch($options['type'])
@@ -174,22 +174,22 @@ class SettingsApi {
 					$sanitizedTabId = \sanitize_title($tabId);
 					$tabDescription = (!empty($item['tab_description']) ) ? $item['tab_description'] : '';
 					$this->sectionId = $sanitizedTabId;
-					$settingArgs = array(
+					$settingArgs = [
 						'option_group' => 'section_page_' . $pageId . '_' . $sanitizedTabId,
 						'option_name' => $settings['option_name']
-					);
+					];
 
 					\register_setting($settingArgs['option_group'], $settingArgs['option_name']);
 
-					$sectionArgs = array(
+					$sectionArgs = [
 						'id' => 'section_id_' . $sanitizedTabId,
 						'title' => $tabDescription,
 						'callback' => 'callback',
 						'menu_page' => $pageId . '_' . $sanitizedTabId
-					);
+					];
 
 					\add_settings_section(
-						$sectionArgs['id'], $sectionArgs['title'], array($this, $sectionArgs['callback']), $sectionArgs['menu_page']
+						$sectionArgs['id'], $sectionArgs['title'], [$this, $sectionArgs['callback']], $sectionArgs['menu_page']
 					);
 
 					if(!empty($item['fields']) && is_array($item['fields'])) {
@@ -199,17 +199,17 @@ class SettingsApi {
 								$title = (!empty($field['title']) ) ? $field['title'] : '';
 								$field['field_id'] = $sanitizedFieldId;
 								$field['option_name'] = $settings['option_name'];
-								$fieldArgs = array(
+								$fieldArgs = [
 									'id' => 'field' . $sanitizedFieldId,
 									'title' => $title,
 									'callback' => 'renderFields',
 									'menu_page' => $pageId . '_' . $sanitizedTabId,
 									'section' => 'section_id_' . $sanitizedTabId,
 									'args' => $field
-								);
+								];
 
 								\add_settings_field(
-									$fieldArgs['id'], $fieldArgs['title'], array($this, $fieldArgs['callback']), $fieldArgs['menu_page'], $fieldArgs['section'], $fieldArgs['args']
+									$fieldArgs['id'], $fieldArgs['title'], [$this, $fieldArgs['callback']], $fieldArgs['menu_page'], $fieldArgs['section'], $fieldArgs['args']
 								);
 							} // END if(is_array($field))
 						} // END foreach($item['fields'] as $field_id => $field)
@@ -253,7 +253,7 @@ class SettingsApi {
 	 * @return boolean
 	 */
 	public function isSettingsPage() {
-		$menus = array();
+		$menus = [];
 		$getPage = \filter_input(\INPUT_GET, 'page');
 		$settingsPage = (!empty($getPage) ) ? $getPage : '';
 		$returnValue = false;
@@ -278,7 +278,7 @@ class SettingsApi {
 	 * Return an array for the choices in a select field type
 	 */
 	public function selectChoices() {
-		$items = array();
+		$items = [];
 
 		if(!empty($this->args['choices']) && \is_array($this->args['choices'])) {
 			foreach($this->args['choices'] as $slug => $choice) {
@@ -294,11 +294,11 @@ class SettingsApi {
 	 */
 	public function get() {
 		if(!empty($this->args['get'])) {
-			$itemArray = \call_user_func_array(array($this, 'get' . StringHelper::camelCase($this->args['get']), true), array($this->args));
+			$itemArray = \call_user_func_array([$this, 'get' . StringHelper::camelCase($this->args['get']), true], [$this->args]);
 		} elseif(!empty($this->args['choices'])) {
 			$itemArray = $this->selectChoices($this->args);
 		} else {
-			$itemArray = array();
+			$itemArray = [];
 		} // END if(!empty($this->args['get']))
 
 		return $itemArray;
@@ -308,7 +308,7 @@ class SettingsApi {
 	 * Get users from WordPress, used by the select field type
 	 */
 	public function getUsers() {
-		$items = array();
+		$items = [];
 		$args = (!empty($this->args['args'])) ? $this->args['args'] : null;
 		$users = \get_users($args);
 
@@ -323,7 +323,7 @@ class SettingsApi {
 	 * Get menus from WordPress, used by the select field type
 	 */
 	public function getMenus() {
-		$items = array();
+		$items = [];
 		$menus = \get_registered_nav_menus();
 
 		if(!empty($menus)) {
@@ -342,14 +342,14 @@ class SettingsApi {
 		$items = null;
 
 		if($this->args['get'] === 'posts' && !empty($this->args['post_type'])) {
-			$args = array(
+			$args = [
 				'category' => 0,
 				'post_type' => 'post',
 				'post_status' => 'publish',
 				'orderby' => 'post_date',
 				'order' => 'DESC',
 				'suppress_filters' => true
-			);
+			];
 
 			$theQuery = new \WP_Query($args);
 
@@ -373,7 +373,7 @@ class SettingsApi {
 	 * Get terms from WordPress, used by the select field type
 	 */
 	public function getTerms() {
-		$items = array();
+		$items = [];
 		$taxonomies = (!empty($this->args['taxonomies']) ) ? $this->args['taxonomies'] : null;
 		$args = (!empty($this->args['args'])) ? $this->args['args'] : null;
 		$terms = \get_terms($taxonomies, $args);
@@ -391,7 +391,7 @@ class SettingsApi {
 	 * Get taxonomies from WordPress, used by the select field type
 	 */
 	public function getTaxonomies() {
-		$items = array();
+		$items = [];
 		$args = (!empty($this->args['args'])) ? $this->args['args'] : null;
 		$taxonomies = \get_taxonomies($args, 'objects');
 
@@ -408,7 +408,7 @@ class SettingsApi {
 	 * Get sidebars from WordPress, used by the select field type
 	 */
 	public function getSidebars() {
-		$items = array();
+		$items = [];
 
 		global $wp_registered_sidebars;
 
@@ -425,7 +425,7 @@ class SettingsApi {
 	 * Get themes from WordPress, used by the select field type
 	 */
 	public function getThemes() {
-		$items = array();
+		$items = [];
 		$args = (!empty($this->args['args'])) ? $this->args['args'] : null;
 		$themes = \wp_get_themes($args);
 
@@ -442,7 +442,7 @@ class SettingsApi {
 	 * Get plugins from WordPress, used by the select field type
 	 */
 	public function getPlugins() {
-		$items = array();
+		$items = [];
 		$args = (!empty($this->args['args'])) ? $this->args['args'] : null;
 		$plugins = \get_plugins($args);
 
@@ -459,7 +459,7 @@ class SettingsApi {
 	 * Get post_types from WordPress, used by the select field type
 	 */
 	public function getPostTypes() {
-		$items = array();
+		$items = [];
 		$args = (!empty($this->args['args'])) ? $this->args['args'] : null;
 		$postTypes = \get_post_types($args, 'objects');
 
@@ -542,7 +542,7 @@ class SettingsApi {
 		unset($key);
 
 		if($this->valueType() == 'array') {
-			$default = (!empty($this->args['default']) && \is_array($this->args['default'])) ? $this->args['default'] : array();
+			$default = (!empty($this->args['default']) && \is_array($this->args['default'])) ? $this->args['default'] : [];
 		} else {
 			$default = (!empty($this->args['default'])) ? $this->args['default'] : '';
 		} // END if($this->valueType() == 'array')
@@ -558,7 +558,7 @@ class SettingsApi {
 	 */
 	public function valueType() {
 		$returnValue = null;
-		$defaultSingle = array(
+		$defaultSingle = [
 			'select',
 			'radio',
 			'text',
@@ -574,11 +574,11 @@ class SettingsApi {
 			'tinymce',
 			'image',
 			'file'
-		);
-		$defaultMultiple = array(
+		];
+		$defaultMultiple = [
 			'multiselect',
 			'checkbox'
-		);
+		];
 
 		if(\in_array($this->args['type'], $defaultSingle)) {
 			$returnValue = 'string';
@@ -722,10 +722,10 @@ class SettingsApi {
 
 				case 'tinymce':
 					$rows = (isset($args['rows'])) ? $args['rows'] : 5;
-					$tinymceSettings = array(
+					$tinymceSettings = [
 						'textarea_rows' => $rows,
 						'textarea_name' => $optionName . '[' . $args['field_id'] . ']',
-					);
+					];
 
 					\wp_editor($this->value(), $args['field_id'], $tinymceSettings);
 					break;
@@ -808,11 +808,11 @@ class SettingsApi {
 
 				case 'custom':
 					$value = (!empty($options[$args['field_id']])) ? $options[$args['field_id']] : null;
-					$data = array(
+					$data = [
 						'value' => $value,
 						'name' => $this->name(),
 						'args' => $args
-					);
+					];
 
 					if($args['content'] !== null) {
 						echo $args['content'];
