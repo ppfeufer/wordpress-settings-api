@@ -341,47 +341,13 @@ class SettingsApi {
     public function getPosts() {
         $items = null;
 
-        if($this->args['get'] === 'posts') {
+        if($this->args['get'] === 'posts' && !empty($this->args['post_type'])) {
             $args = [
                 'category' => 0,
-                'post_type' => 'post',
+                'post_type' => $this->args['post_type'],
                 'post_status' => 'publish',
-                'orderby' => 'post_date',
-                'order' => 'DESC',
-                'suppress_filters' => true
-            ];
-
-            $theQuery = new \WP_Query($args);
-
-            if($theQuery->have_posts()) {
-                while($theQuery->have_posts()) {
-                    $theQuery->the_post();
-
-                    global $post;
-
-                    $items[$post->ID] = \get_the_title();
-                }
-            }
-
-            \wp_reset_postdata();
-        }
-
-        return $items;
-    }
-
-    /**
-     * Get pages from WordPress, used by the select field type
-     */
-    public function getPages() {
-        $items = null;
-
-        if($this->args['get'] === 'pages') {
-            $args = [
-                'category' => 0,
-                'post_type' => 'page',
-                'post_status' => 'publish',
-                'orderby' => 'post_date',
-                'order' => 'DESC',
+                'orderby' => 'post_title',
+                'order' => 'ASC',
                 'suppress_filters' => true
             ];
 
