@@ -348,7 +348,8 @@ class SettingsApi {
                 'post_status' => 'publish',
                 'orderby' => 'post_title',
                 'order' => 'ASC',
-                'suppress_filters' => true
+                'suppress_filters' => true,
+                'posts_per_page' => -1
             ];
 
             $theQuery = new \WP_Query($args);
