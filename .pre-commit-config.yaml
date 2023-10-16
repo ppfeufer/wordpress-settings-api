@@ -9,7 +9,7 @@ default_language_version:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       # Identify invalid files
       - id: check-ast
@@ -49,7 +49,7 @@ repos:
           )
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.49.0
+    rev: v8.51.0
     hooks:
       - id: eslint
         exclude: |
@@ -76,7 +76,7 @@ repos:
           - stylelint-config-standard@34.0.0  # https://github.com/stylelint/stylelint-config-standard/releases/latest
 
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: 2.7.2
+    rev: 2.7.3
     hooks:
       - id: editorconfig-checker
         exclude: |
