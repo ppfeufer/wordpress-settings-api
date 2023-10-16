@@ -1,3 +1,5 @@
 # WordPress Settings API
 
-for usage in themes and plugins to easiely add some settings
+For usage in themes and plugins to easily add some settings.
+
+Min. PHP version: 8.2
