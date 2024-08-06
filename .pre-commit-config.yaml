@@ -17,7 +17,10 @@ ci:
   autoupdate_branch: 'master'
   autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
   autoupdate_schedule: monthly
-  skip: []
+  skip:
+    - eslint  # Skip ESLint checks in CI due to missing node environment
+#    - php-lint-all  # Skip PHP lint checks in CI due to missing PHP environment
+#    - php-cs  # Skip PHP Code Sniffer checks in CI due to missing PHP environment
   submodules: false
 
 # pre-commit setup
@@ -63,7 +66,7 @@ repos:
           )
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.6.0
+    rev: v9.8.0
     hooks:
       - id: eslint
         exclude: |
@@ -74,7 +77,7 @@ repos:
           )
 
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: v16.6.1
+    rev: v16.8.1
     hooks:
       - id: stylelint
         exclude: |
@@ -86,8 +89,8 @@ repos:
         args:
           - --formatter=compact
         additional_dependencies:
-          - stylelint@15.11.0  # https://github.com/stylelint/stylelint/releases/latest
-          - stylelint-config-standard@34.0.0  # https://github.com/stylelint/stylelint-config-standard/releases/latest
+          - stylelint@16.8.1  # https://github.com/stylelint/stylelint/releases/latest
+          - stylelint-config-standard@36.0.1  # https://github.com/stylelint/stylelint-config-standard/releases/latest
 
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
     rev: 2.7.3
