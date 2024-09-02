@@ -66,7 +66,7 @@ repos:
           )
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.8.0
+    rev: v9.9.1
     hooks:
       - id: eslint
         exclude: |
@@ -77,7 +77,7 @@ repos:
           )
 
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: v16.8.1
+    rev: v16.9.0
     hooks:
       - id: stylelint
         exclude: |
@@ -93,7 +93,7 @@ repos:
           - stylelint-config-standard@36.0.1  # https://github.com/stylelint/stylelint-config-standard/releases/latest
 
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: 2.7.3
+    rev: 3.0.3
     hooks:
       - id: editorconfig-checker
         exclude: |
